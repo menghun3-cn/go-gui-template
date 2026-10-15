@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["version", "assets"],
+  "properties": {
+    "version": { "type": "string" },
+    "notes": { "type": "string" },
+    "url": { "type": "string" },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["os", "arch", "name", "url", "sha256"],
+        "properties": {
+          "os": { "enum": ["windows", "linux", "darwin"] },
+          "arch": { "enum": ["amd64", "arm64"] },
+          "name": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" }
+        }
+      }
+    }
+  }
+}

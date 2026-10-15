@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Go GUI Template</title>
+    <link rel="stylesheet" href="app.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">Go GUI Template</p>
+        <h1>单 exe 桌面模板</h1>
+        <p class="lede">基于 Go + Wails + 内嵌前端，自带更新与自启动骨架。</p>
+      </header>
+      <section class="status">
+        <article>
+          <span class="label">Version</span>
+          <strong id="version">dev</strong>
+        </article>
+        <article>
+          <span class="label">Named Pipe</span>
+          <strong id="pipe">off</strong>
+        </article>
+        <article>
+          <span class="label">Server</span>
+          <strong id="server">starting</strong>
+        </article>
+      </section>
+      <section class="actions">
+        <button id="checkUpdate">检查更新</button>
+        <button id="setLogin">开机自启动</button>
+      </section>
+      <p id="out" class="out" role="status"></p>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

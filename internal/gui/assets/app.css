@@ -1,0 +1,72 @@
+:root {
+  color-scheme: dark;
+  --bg: #101418;
+  --panel: #181f26;
+  --ink: #edf2f7;
+  --muted: #9aa7b2;
+  --accent: #d9771f;
+  --line: rgba(255,255,255,.08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(1000px 500px at 80% -10%, rgba(217,119,31,.25), transparent 60%),
+    radial-gradient(700px 400px at 10% 110%, rgba(45,128,190,.18), transparent 60%),
+    var(--bg);
+  color: var(--ink);
+  font: 15px/1.5 "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+.shell { max-width: 720px; margin: 0 auto; padding: 72px 24px 48px; }
+
+.hero { margin-bottom: 32px; }
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: 12px;
+  font-weight: 700;
+}
+h1 { margin: 0 0 10px; font-size: 40px; line-height: 1.1; letter-spacing: -.02em; }
+.lede { margin: 0; color: var(--muted); font-size: 18px; }
+
+.status {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.status article {
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.label { display: block; color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+strong { font-size: 18px; }
+
+.actions { display: flex; gap: 12px; flex-wrap: wrap; }
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font: inherit;
+  font-weight: 700;
+  color: #160d04;
+  background: var(--accent);
+  cursor: pointer;
+}
+button:hover { filter: brightness(1.1); }
+
+.out { min-height: 24px; margin: 24px 0 0; color: var(--muted); white-space: pre-wrap; }
+
+@media (max-width: 560px) {
+  .shell { padding: 48px 18px 32px; }
+  .status { grid-template-columns: 1fr; }
+  h1 { font-size: 32px; }
+}

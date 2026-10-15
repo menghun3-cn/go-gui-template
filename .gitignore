@@ -1,0 +1,7 @@
+dist/
+*.exe
+*.syso
+*.old
+__pycache__/
+.idea/
+.vscode/
