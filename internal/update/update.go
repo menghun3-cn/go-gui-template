@@ -18,7 +18,7 @@ import (
 	"time"
 )
 
-const defaultFeed = "https://your-host.example/app/latest.json"
+var defaultFeed = "https://your-host.example/app/latest.json"
 
 // Release is the update feed schema. Keep it small and versioned.
 type Release struct {
