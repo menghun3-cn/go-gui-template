@@ -111,23 +111,34 @@ jobs:
             Write-Host "::warning::WINDOWS_SIGNING_CERT not configured; skipping Windows Authenticode signing"
             exit 0
           }
+          if (-not $env:CERT_PASSWORD) {
+            Write-Host "::warning::WINDOWS_SIGNING_CERT_PASSWORD not configured; skipping Windows Authenticode signing"
+            exit 0
+          }
           $pfx = Join-Path $env:RUNNER_TEMP "gogui-signing.pfx"
-          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:CERT))
+          try {
+            [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:CERT.Trim()))
+          } catch {
+            Write-Host "::error::WINDOWS_SIGNING_CERT is not valid base64: $($_.Exception.Message)"
+            throw
+          }
           $signtool = Get-Command signtool.exe -ErrorAction SilentlyContinue
           if (-not $signtool) {
+            $pf32 = ${env:ProgramFiles(x86)}
             $candidates = @(
-              "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe",
-              "C:\Program Files\Windows Kits\10\bin\*\x64\signtool.exe"
+              (Join-Path $env:ProgramFiles 'Windows Kits\10\bin\*\x64\signtool.exe'),
+              (Join-Path $pf32 'Windows Kits\10\bin\*\x64\signtool.exe')
             )
             foreach ($pattern in $candidates) {
-              $found = Get-ChildItem $pattern -ErrorAction SilentlyContinue | Select-Object -First 1
+              $found = Get-ChildItem $pattern -ErrorAction SilentlyContinue | Sort-Object FullName -Descending | Select-Object -First 1
               if ($found) { $signtool = $found; break }
             }
           }
           if (-not $signtool) {
             throw "signtool.exe not found"
           }
-          & $signtool.Source sign /f $pfx /p $env:CERT_PASSWORD /fd SHA256 /v "dist/gogui-windows-amd64.exe"
+          Write-Host "using $( $signtool.Source )"
+          & $signtool.Source sign /f $pfx /p $env:CERT_PASSWORD /fd SHA256 /v "dist/gogui-windows-amd64.exe" 2>&1 | ForEach-Object { Write-Host $_ }
           if ($LASTEXITCODE -ne 0) {
             throw "signtool failed with exit code $LASTEXITCODE"
           }
