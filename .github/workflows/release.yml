@@ -162,21 +162,10 @@ jobs:
             -OutFile "$PWD/dist/latest.json"
 
       - name: Create release
-        env:
-          GH_TOKEN: ${{ github.GITHUB_TOKEN }}
-          GH_REF: ${{ needs.version.outputs.tag }}
-        shell: bash
-        run: |
-          set -euxo pipefail
-          shopt -s nullglob
-          files=(dist/gogui-* dist/latest.json)
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "no build artifacts found" >&2
-            exit 1
-          fi
-          # If the release already exists, upload assets to it (useful for retries).
-          if gh release view "$GH_REF" >/dev/null 2>&1; then
-            gh release upload "$GH_REF" "${files[@]}" --clobber
-          else
-            gh release create "$GH_REF" "${files[@]}" --generate-notes
-          fi
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          generate_release_notes: true
+          files: |
+            dist/gogui-*
+            dist/latest.json
