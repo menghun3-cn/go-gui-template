@@ -122,23 +122,30 @@ jobs:
             Write-Host "::error::WINDOWS_SIGNING_CERT is not valid base64: $($_.Exception.Message)"
             throw
           }
-          $signtool = Get-Command signtool.exe -ErrorAction SilentlyContinue
+          $signtool = $null
+          $cmd = Get-Command signtool.exe -ErrorAction SilentlyContinue
+          if ($cmd -and $cmd.Source) { $signtool = $cmd.Source }
           if (-not $signtool) {
-            $pf32 = ${env:ProgramFiles(x86)}
-            $candidates = @(
-              (Join-Path $env:ProgramFiles 'Windows Kits\10\bin\*\x64\signtool.exe'),
-              (Join-Path $pf32 'Windows Kits\10\bin\*\x64\signtool.exe')
-            )
-            foreach ($pattern in $candidates) {
-              $found = Get-ChildItem $pattern -ErrorAction SilentlyContinue | Sort-Object FullName -Descending | Select-Object -First 1
-              if ($found) { $signtool = $found; break }
+            $roots = @($env:ProgramFiles, ${env:ProgramFiles(x86)}) | Where-Object { $_ }
+            foreach ($root in $roots) {
+              $kits = Join-Path $root 'Windows Kits\10\bin'
+              if (Test-Path $kits) {
+                foreach ($ver in (Get-ChildItem $kits -Directory | Sort-Object Name -Descending)) {
+                  $candidate = Join-Path $ver.FullName 'x64\signtool.exe'
+                  if (Test-Path $candidate) {
+                    $signtool = $candidate
+                    break
+                  }
+                }
+              }
+              if ($signtool) { break }
             }
           }
           if (-not $signtool) {
-            throw "signtool.exe not found"
+            throw "signtool.exe not found on Windows runner"
           }
-          Write-Host "using $( $signtool.Source )"
-          & $signtool.Source sign /f $pfx /p $env:CERT_PASSWORD /fd SHA256 /v "dist/gogui-windows-amd64.exe" 2>&1 | ForEach-Object { Write-Host $_ }
+          Write-Host "using $signtool"
+          & $signtool sign /f $pfx /p $env:CERT_PASSWORD /fd SHA256 /v "dist/gogui-windows-amd64.exe" 2>&1 | ForEach-Object { Write-Host $_ }
           if ($LASTEXITCODE -ne 0) {
             throw "signtool failed with exit code $LASTEXITCODE"
           }
